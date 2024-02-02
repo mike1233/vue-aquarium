@@ -3,8 +3,7 @@ export interface Fish{
     img: string;
 }
 
-export interface FishExtended {
-    fish: Fish
+export interface FishExtended extends Fish{
     aquarium: DOMRect
     velocityX: number
     velocityY: number

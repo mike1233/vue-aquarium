@@ -1,35 +1,37 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, watch } from "vue";
 import deadFish from './assets/dead.png';
-import type { Fish, FishExtended } from "./models/fish.model";
+import type { FishExtended } from "./models/fish.model";
 import { getRandomInt } from "./utils";
 
 const props = defineProps<{
-  fish: Fish;
+  fish: FishExtended;
   aquarium: DOMRect;
+  paused: boolean;
+}>();
+
+const emit = defineEmits<{
+  (event: 'updateFish', fish: FishExtended): void;
 }>();
 
 const FISH_WIDTH = 64;
 const FISH_HEIGHT = 64 + 8;
 
-const fishState = reactive<FishExtended>({
-  fish: props.fish,
-  aquarium: props.aquarium,
-  velocityX: 0,
-  velocityY: 0,
-  foodMeter: 100,
-  starveRate: getRandomInt(1, 3),
-  xPos: 0,
-  yPos: 0,
-  updateInterval: null,
-});
+const fishState = reactive<FishExtended>(props.fish);
 
 const decideVelocity = () => {
+  if (fishState.velocityX && fishState.velocityY) {
+    return;
+  }
   fishState.velocityX = Math.random() * 5;
   fishState.velocityY = Math.random() * 5;
 };
 
 const decideStartingPosition = () => {
+  if(fishState.xPos && fishState.yPos) {
+    return;
+  }
+
   fishState.xPos = getRandomInt(FISH_WIDTH * 2, fishState.aquarium.width - FISH_WIDTH * 2);
   fishState.yPos = getRandomInt(FISH_HEIGHT * 2, fishState.aquarium.height - FISH_HEIGHT * 2);
 };
@@ -73,6 +75,9 @@ const eatFood = () => {
 };
 
 const starve = () => {
+  if (isDead.value) {
+    return;
+  }
   fishState.foodMeter -= fishState.starveRate;
 };
 
@@ -92,7 +97,7 @@ const fishImage = computed(() => {
   if (isDead.value) {
     return deadFish;
   }
-  return fishState.fish.img;
+  return fishState.img;
 });
 
 const fishPositionStyle = computed(() => ({
@@ -117,10 +122,14 @@ const fishHealthStyle = computed(() => ({
 
 const setFishInterval = () => {
   fishState.updateInterval = setInterval(() => {
+    if(props.paused) {
+      return;
+    }
     starve();
     if (isDead.value && fishState.yPos >= yBoundary.value) {
       clearInterval(fishState.updateInterval as NodeJS.Timer);
     }
+    emit('updateFish', fishState);
     moveFish();
   }, 100);
 };
@@ -145,6 +154,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div @click="eatFood" class="fish absolute transition-all will-change-transform ease-in" :style="fishPositionStyle">
+    <div class="text-black flex justify-center w-full pointer-events-none">{{ fish.name }}</div>
     <div class="bg-red-500 h-2 w-16">
       <div :style="fishHealthStyle" class="bg-green-500 h-2"></div>
     </div>
