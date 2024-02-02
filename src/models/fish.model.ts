@@ -9,7 +9,8 @@ export interface FishExtended {
     velocityX: number
     velocityY: number
     foodMeter: number
+    starveRate: number
     xPos: number
     yPos: number
-    updateInterval: ReturnType<typeof setInterval> | null
+    updateInterval: NodeJS.Timer | null
 }

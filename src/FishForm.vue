@@ -30,7 +30,7 @@ const fish = ref<Fish[]>([
         img: tropicalFish,
     },
     {
-        name: 'Maarten',
+        name: 'Mikayla',
         img: tuna,
     }
 ]);

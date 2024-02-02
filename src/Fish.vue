@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, watch } from "vue";
 import deadFish from './assets/dead.png';
 import type { Fish, FishExtended } from "./models/fish.model";
+import { getRandomInt } from "./utils";
 
 const props = defineProps<{
   fish: Fish;
@@ -17,16 +18,11 @@ const fishState = reactive<FishExtended>({
   velocityX: 0,
   velocityY: 0,
   foodMeter: 100,
+  starveRate: getRandomInt(1, 3),
   xPos: 0,
   yPos: 0,
   updateInterval: null,
 });
-
-const getRandomInt = (min: number, max: number) => { 
-  min = Math.ceil(min); 
-  max = Math.floor(max); 
-  return Math.floor(Math.random() * (max - min + 1)) + min; 
-} 
 
 const decideVelocity = () => {
   fishState.velocityX = Math.random() * 5;
@@ -55,7 +51,6 @@ const moveFish = () => {
   const isOutsideXEnd = fishState.xPos > xBoundary.value;
   const isMovingToXEnd = fishState.xPos < previousX;
   
-
   if ((isOutsideXStart && !isMovingToXStart) || (isOutsideXEnd && !isMovingToXEnd)) {
     fishState.velocityX *= -1;
   }  
@@ -78,7 +73,7 @@ const eatFood = () => {
 };
 
 const starve = () => {
-  fishState.foodMeter -= 0.5;
+  fishState.foodMeter -= fishState.starveRate;
 };
 
 const xBoundary = computed(() => {
