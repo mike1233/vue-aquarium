@@ -1,11 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import Aquarium from './Aquarium.vue';
 import FishForm from './FishForm.vue';
+import type { Fish } from './models/fish.model';
 
-const fish = ref([]);
+const fish = ref<Fish[]>([]);
 
-const addFish = (newFish) => {
+const addFish = (newFish: Fish) => {
     fish.value.push(newFish);
 };
 

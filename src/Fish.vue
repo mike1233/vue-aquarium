@@ -1,33 +1,28 @@
-<script setup>
+<script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, watch } from "vue";
 import deadFish from './assets/dead.png';
+import type { Fish, FishExtended } from "./models/fish.model";
 
-const props = defineProps({
-  fish: {
-    type: Object,
-    required: true,
-  },
-  aquarium: {
-    type: DOMRect,
-    required: true,
-  },
-});
+const props = defineProps<{
+  fish: Fish;
+  aquarium: DOMRect;
+}>();
 
 const FISH_WIDTH = 64;
 const FISH_HEIGHT = 64 + 8;
 
-const fishState = reactive({
+const fishState = reactive<FishExtended>({
   fish: props.fish,
   aquarium: props.aquarium,
-  velocityX: null,
-  velocityY: null,
+  velocityX: 0,
+  velocityY: 0,
   foodMeter: 100,
-  xPos: null,
-  yPos: null,
+  xPos: 0,
+  yPos: 0,
   updateInterval: null,
 });
 
-const getRandomInt = (min, max) => { 
+const getRandomInt = (min: number, max: number) => { 
   min = Math.ceil(min); 
   max = Math.floor(max); 
   return Math.floor(Math.random() * (max - min + 1)) + min; 
@@ -129,7 +124,7 @@ const setFishInterval = () => {
   fishState.updateInterval = setInterval(() => {
     starve();
     if (isDead.value && fishState.yPos >= yBoundary.value) {
-      clearInterval(fishState.updateInterval);
+      clearInterval(fishState.updateInterval?.unref());
     }
     moveFish();
   }, 100);
@@ -149,7 +144,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  clearInterval(fishState.updateInterval);
+  clearInterval(fishState.updateInterval?.unref());
 });
 </script>
 

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { reactive, ref } from 'vue';
 import goldenPurpleFish from './assets/golden-purple-fish.png';
 import goldFish from './assets/goldfish.png';
@@ -6,65 +6,64 @@ import guppie from './assets/guppie.png';
 import tropicalFish from './assets/tropical-fish.png';
 import tuna from './assets/tuna.png';
 
+import { type Fish } from './models/fish.model';
 
-const emit = defineEmits(['addFish']);
+const emit = defineEmits<{
+    (event: 'addFish', fish: Fish): void;
+}>();
 
-const fish = ref([
+const fish = ref<Fish[]>([
     {
-        type: 'Mike',
+        name: 'Mike',
         img: goldFish,
     },
     {
-        type: 'Ricky',
+        name: 'Ricky',
         img: goldenPurpleFish,
     },
     {
-        type: 'Steven',
+        name: 'Steven',
         img: guppie,
     },
     {
-        type: 'Ian',
+        name: 'Ian',
         img: tropicalFish,
     },
     {
-        type: 'Maarten',
+        name: 'Maarten',
         img: tuna,
     }
-
 ]);
 
-const form  = reactive({
+const form  = reactive<Fish>({
     name: '',
-    fishType: ''
+    img: ''
 })
 
-const selectFish = (fish) => {
-    form.name = fish.type
-    form.fishType = fish.img
+const selectFish = (fish: Fish) => {
+    form.name = fish.name
+    form.img = fish.img
 };
 
-const submitNewFish = (event) => {
+const submitNewFish = (event: Event) => {
     event.preventDefault();
-    emit('addFish', {
-        name: form.name,
-        img: form.fishType
-    });
+    emit('addFish', form);
 };
 
 </script>
 <template>
-    <section class="bg-red-200 w-[25vw] h-screen">
-        <form @submit="submitNewFish" class="flex flex-col gap-2 p-4">
+    <section class="bg-blue-200 w-[25vw] h-screen">
+        <form @submit="submitNewFish" class="flex flex-col h-full gap-2 p-4">
             <h2 class="text-2xl font-bold">Add a Fish</h2>
             <label for="species">Species</label>
             <div class="flex flex-wrap gap-2">
-                <img @click="selectFish(f)" class="w-16 h-16 object-contain" v-for="f in fish" :key="f.type" :src="f.img" :alt="f.type"/>
+                <img @click="selectFish(f)" class="w-16 h-16 object-contain" v-for="f in fish" :key="f.name" :src="f.img" :alt="f.img"/>
             </div>
           
             <label for="name">Name</label>
             <input type="text" id="name" v-model="form.name" />
             
-            <button :disabled="!form.name || !form.fishType" class="bg-blue-500 text-white p-2 rounded-md">Add Fish</button>
+            <button :disabled="!form.name || !form.img" class="bg-blue-500 mt-auto text-white p-2 rounded-md">Add Fish</button>
         </form>
     </section>
 </template>
