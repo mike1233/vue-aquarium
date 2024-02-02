@@ -124,7 +124,7 @@ const setFishInterval = () => {
   fishState.updateInterval = setInterval(() => {
     starve();
     if (isDead.value && fishState.yPos >= yBoundary.value) {
-      clearInterval(fishState.updateInterval?.unref());
+      clearInterval(fishState.updateInterval as NodeJS.Timer);
     }
     moveFish();
   }, 100);
@@ -144,7 +144,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  clearInterval(fishState.updateInterval?.unref());
+  clearInterval(fishState.updateInterval as NodeJS.Timer);
 });
 </script>
 
