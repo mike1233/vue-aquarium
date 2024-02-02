@@ -63,7 +63,7 @@ const submitNewFish = (event: Event) => {
             <label for="name">Name</label>
             <input type="text" id="name" v-model="form.name" />
             
-            <button :disabled="!form.name || !form.img" class="bg-blue-500 mt-auto text-white p-2 rounded-md">Add Fish</button>
+            <button :disabled="!form.name || !form.img" class="bg-blue-500 hover:bg-blue-400 transition-colors mt-auto text-white p-2 rounded-md">Add Fish</button>
         </form>
     </section>
 </template>

@@ -75,15 +75,15 @@ onMounted(() => {
     ref="aquarium"
     class="relative bg-aquarium bg-center bg-cover bg-no-repeat w-[75vw] h-screen"
   >
-    <div class="game-buttons mt-2 mr-2 flex flex justify-end gap-2">
+    <div class="game-buttons mt-2 mr-2 flex justify-end gap-2">
       <button
-        class="bg-blue-500 text-white px-4 py-2 rounded-md"
+        class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-md transition-colors"
         @click="togglePause"
       >
         {{ pauseButtonText }}
       </button>
       <button
-        class="bg-blue-500 text-white px-4 py-2 rounded-md"
+        class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-md transition-colors"
         @click="saveGame"
       >
         Save
