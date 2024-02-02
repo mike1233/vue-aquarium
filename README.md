@@ -7,6 +7,8 @@ tags: vue
 
 # Virtual Aquarium
 
+Live Site: [Virtual Aquarium](https://mike1233.github.io/vue-aquarium/)
+
 # Challenge Description
 
 Your task is to create a fun and functional Vue.js powered virtual aquarium.
