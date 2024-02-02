@@ -1,10 +1,10 @@
 <script setup>
 import { reactive, ref } from 'vue';
-import goldenPurpleFish from '../public/golden-purple-fish.png';
-import goldFish from '../public/goldfish.png';
-import guppie from '../public/guppie.png';
-import tropicalFish from '../public/tropical-fish.png';
-import tuna from '../public/tuna.png';
+import goldenPurpleFish from './assets/golden-purple-fish.png';
+import goldFish from './assets/goldfish.png';
+import guppie from './assets/guppie.png';
+import tropicalFish from './assets/tropical-fish.png';
+import tuna from './assets/tuna.png';
 
 
 const emit = defineEmits(['addFish']);
@@ -19,15 +19,15 @@ const fish = ref([
         img: goldenPurpleFish,
     },
     {
-        type: 'Guppie',
+        type: 'Steven',
         img: guppie,
     },
     {
-        type: 'Fish',
+        type: 'Ian',
         img: tropicalFish,
     },
     {
-        type: 'Tuna',
+        type: 'Maarten',
         img: tuna,
     }
 

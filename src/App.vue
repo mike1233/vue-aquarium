@@ -11,7 +11,7 @@ const addFish = (newFish) => {
 
 </script>
 <template>
-    <main class="flex gap-2">
+    <main class="flex gap-2 overflow-hidden">
         <FishForm @add-fish="addFish" />
         <Aquarium :fish="fish"/>
     </main>

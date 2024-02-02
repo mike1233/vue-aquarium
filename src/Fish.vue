@@ -1,6 +1,6 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive } from "vue";
-import deadFish from '../public/dead.png';
+import { computed, onBeforeUnmount, onMounted, reactive, watch } from "vue";
+import deadFish from './assets/dead.png';
 
 const props = defineProps({
   fish: {
@@ -27,14 +27,20 @@ const fishState = reactive({
   updateInterval: null,
 });
 
+const getRandomInt = (min, max) => { 
+  min = Math.ceil(min); 
+  max = Math.floor(max); 
+  return Math.floor(Math.random() * (max - min + 1)) + min; 
+} 
+
 const decideVelocity = () => {
-  fishState.velocityX = Math.random() * 3;
-  fishState.velocityY = Math.random() * 3;
+  fishState.velocityX = Math.random() * 5;
+  fishState.velocityY = Math.random() * 5;
 };
 
 const decideStartingPosition = () => {
-  fishState.xPos = Math.random() * (fishState.aquarium.width - FISH_WIDTH);
-  fishState.yPos = Math.random() * (fishState.aquarium.height - FISH_HEIGHT);
+  fishState.xPos = getRandomInt(FISH_WIDTH * 2, fishState.aquarium.width - FISH_WIDTH * 2);
+  fishState.yPos = getRandomInt(FISH_HEIGHT * 2, fishState.aquarium.height - FISH_HEIGHT * 2);
 };
 
 const moveFish = () => {
@@ -43,13 +49,28 @@ const moveFish = () => {
     return;
   }
 
+  const previousX = fishState.xPos;
+  const previousY = fishState.yPos;
+
   fishState.xPos += fishState.velocityX;
   fishState.yPos += fishState.velocityY;
 
-  if (fishState.xPos > xBoundary.value || fishState.xPos < 0) {
+  const isOutsideXStart = fishState.xPos < 0;
+  const isMovingToXStart = fishState.xPos > previousX;
+  const isOutsideXEnd = fishState.xPos > xBoundary.value;
+  const isMovingToXEnd = fishState.xPos < previousX;
+  
+
+  if ((isOutsideXStart && !isMovingToXStart) || (isOutsideXEnd && !isMovingToXEnd)) {
     fishState.velocityX *= -1;
-  }
-  if (fishState.yPos > yBoundary.value || fishState.yPos < 0) {
+  }  
+  
+  const isOutsideYStart = fishState.yPos < 0;
+  const isMovingToYStart = fishState.yPos > previousY;
+  const isOutsideYEnd = fishState.yPos > yBoundary.value;
+  const isMovingToYEnd = fishState.yPos < previousY;
+  
+  if ((isOutsideYStart && !isMovingToYStart) || (isOutsideYEnd && !isMovingToYEnd)){
     fishState.velocityY *= -1;
   }
 };
@@ -114,6 +135,13 @@ const setFishInterval = () => {
   }, 100);
 };
 
+watch(
+  () => props.aquarium,
+  () => {
+    fishState.aquarium = props.aquarium;
+  }
+)
+
 onMounted(() => {
   decideStartingPosition();
   decideVelocity();
@@ -126,7 +154,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div @click="eatFood" class="fish absolute transition-all ease-in" :style="fishPositionStyle">
+  <div @click="eatFood" class="fish absolute transition-all will-change-transform ease-in" :style="fishPositionStyle">
     <div class="bg-red-500 h-2 w-16">
       <div :style="fishHealthStyle" class="bg-green-500 h-2"></div>
     </div>

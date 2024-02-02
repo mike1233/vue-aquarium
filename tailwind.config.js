@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       backgroundImage: {
-        aquarium: "url('./public/bg.jpg')",
+        aquarium: "url('./src/assets/bg.jpg')",
       },
     },
   },
