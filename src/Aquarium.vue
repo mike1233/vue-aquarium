@@ -18,7 +18,7 @@ const getAquariumBounds = () => {
 </script>
 
 <template>
-    <section ref="aquarium" class="relative bg-[url('/bg.jpg')] bg-cover bg-no-repeat w-[75vw] h-screen">
+    <section ref="aquarium" class="relative bg-aquarium bg-cover bg-no-repeat w-[75vw] h-screen">
         <Fish v-for="f, index in fish" :key="`fish-${index}`" :fish="f" :aquarium="getAquariumBounds()" />
     </section>
 </template>

@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive } from "vue";
+import deadFish from '../public/dead.png';
 
 const props = defineProps({
   fish: {
@@ -78,7 +79,7 @@ const isDead = computed(() => {
 
 const fishImage = computed(() => {
   if (isDead.value) {
-    return "/dead.png";
+    return deadFish;
   }
   return fishState.fish.img;
 });

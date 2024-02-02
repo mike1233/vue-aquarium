@@ -1,28 +1,34 @@
 <script setup>
 import { reactive, ref } from 'vue';
+import goldenPurpleFish from '../public/golden-purple-fish.png';
+import goldFish from '../public/goldfish.png';
+import guppie from '../public/guppie.png';
+import tropicalFish from '../public/tropical-fish.png';
+import tuna from '../public/tuna.png';
+
 
 const emit = defineEmits(['addFish']);
 
 const fish = ref([
     {
         type: 'Mike',
-        img: '/goldfish.png',
+        img: goldFish,
     },
     {
         type: 'Ricky',
-        img: '/golden-purple-fish.png',
+        img: goldenPurpleFish,
     },
     {
         type: 'Guppie',
-        img: '/guppie.png',
+        img: guppie,
     },
     {
         type: 'Fish',
-        img: '/tropical-fish.png',
+        img: tropicalFish,
     },
     {
         type: 'Tuna',
-        img: '/tuna.png',
+        img: tuna,
     }
 
 ]);
