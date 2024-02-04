@@ -6,7 +6,6 @@ import { useGameState } from "./composables/useGameState";
 
 const {
   state,
-  aquariumFish,
   retrieveGame,
   togglePause,
   saveGame,
@@ -26,7 +25,7 @@ onMounted(() => {
     <FishForm @add-fish="addFish" :fish="state.fish" />
     <Aquarium
       :is-paused="state.isPaused"
-      :fish="aquariumFish"
+      :fish="state.fish"
       @update-fish="updateFish"
     >
       <div class="game-buttons mt-2 mr-2 flex justify-end gap-2">

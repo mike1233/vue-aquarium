@@ -1,12 +1,13 @@
-import { computed, reactive } from "vue";
+import { reactive } from "vue";
 import type { Fish, FishExtended } from "../models/fish.model";
 
-const state = reactive<{ fish: Array<Fish | FishExtended>; isPaused: boolean }>(
-  {
-    fish: [],
-    isPaused: true,
-  }
-);
+const state = reactive<{
+  fish: FishExtended[];
+  isPaused: boolean;
+}>({
+  fish: [],
+  isPaused: true,
+});
 
 export function useGameState() {
   const togglePause = () => (state.isPaused = !state.isPaused);
@@ -20,7 +21,7 @@ export function useGameState() {
   };
 
   const saveGame = () => {
-    localStorage.setItem("fish", JSON.stringify(aquariumFish.value));
+    localStorage.setItem("fish", JSON.stringify(state.fish));
   };
 
   const clearGame = () => {
@@ -29,7 +30,16 @@ export function useGameState() {
   };
 
   const addFish = (newFish: Fish) => {
-    state.fish.push(newFish);
+    state.fish.push({
+      velocityX: 0,
+      velocityY: 0,
+      foodMeter: 100,
+      starveRate: 0.5,
+      xPos: 0,
+      yPos: 0,
+      updateInterval: null,
+      ...newFish,
+    });
   };
 
   const updateFish = (fish: FishExtended) => {
@@ -37,26 +47,8 @@ export function useGameState() {
     f = fish;
   };
 
-  const aquariumFish = computed<FishExtended[]>(() => {
-    return state.fish.map((f) => {
-      if ("velocityX" in f) return f;
-
-      return {
-        velocityX: 0,
-        velocityY: 0,
-        foodMeter: 100,
-        starveRate: 0.5,
-        xPos: 0,
-        yPos: 0,
-        updateInterval: null,
-        ...f,
-      };
-    });
-  });
-
   return {
     state,
-    aquariumFish,
     addFish,
     updateFish,
     togglePause,

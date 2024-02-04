@@ -133,8 +133,6 @@ const fishHealthStyle = computed(() => ({
 }));
 
 const setFishInterval = () => {
-  emit("updateFish", fishState);
-
   fishState.updateInterval = setInterval(() => {
     if (props.paused) {
       return;
@@ -143,8 +141,8 @@ const setFishInterval = () => {
     if (isDead.value && fishState.yPos >= yBoundary.value) {
       clearInterval(fishState.updateInterval as NodeJS.Timer);
     }
-    emit("updateFish", fishState);
     moveFish();
+    emit("updateFish", fishState);
   }, 100);
 };
 
@@ -152,6 +150,8 @@ onMounted(() => {
   decideStartingPosition();
   decideVelocity();
   setFishInterval();
+
+  emit("updateFish", fishState);
 });
 
 onBeforeUnmount(() => {
@@ -161,21 +161,27 @@ onBeforeUnmount(() => {
 
 <template>
   <div
-    @click="eatFood"
-    class="fish absolute transition-all will-change-transform ease-in"
+    class="fish absolute flex flex-col items-center transition-all will-change-transform ease-in"
     :style="fishPositionStyle"
   >
-    <div class="text-black flex justify-center w-full pointer-events-none">
-      {{ fish.name }}
-    </div>
-    <div class="bg-red-500 h-2 w-16">
-      <div :style="fishHealthStyle" class="bg-green-500 h-2"></div>
+    <div
+      class="flex flex-col items-center pointer-events-none rounded-md border-white border-2 overflow-hidden"
+    >
+      <div class="bg-red-500 h-2 w-full">
+        <div :style="fishHealthStyle" class="bg-green-500 h-2"></div>
+      </div>
+      <div
+        class="text-black bg-white flex justify-center w-full pointer-events-none"
+      >
+        {{ fish.name }}
+      </div>
     </div>
     <img
       class="w-16 h-16 object-contain"
       :style="fishStyle"
       :src="fishImage"
       :alt="fish.name"
+      @click="eatFood"
     />
   </div>
 </template>
