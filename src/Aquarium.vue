@@ -1,22 +1,25 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import FishComponent from "./Fish.vue";
-import type { Fish, FishExtended } from "./models/fish.model";
-import { getRandomInt } from "./utils";
+import type { FishExtended } from "./models/fish.model";
 
-const props = defineProps<{
-  fish: Fish[];
+defineProps<{
+  fish: Array<FishExtended>;
   isPaused: boolean;
+}>();
+
+const emit = defineEmits<{
+  (event: "updateFish", fish: FishExtended): void;
 }>();
 
 const aquarium = ref<HTMLDivElement>();
 const aquariumBounds = ref<DOMRect | null>(null);
 
-const aquariumState = reactive<{ fish: FishExtended[] }>({
-  fish: [],
-});
-
 const getAquariumBounds = () => aquarium.value?.getBoundingClientRect() ?? null;
+
+const onUpdateFish = (updatedFish: FishExtended) => {
+  emit("updateFish", updatedFish);
+};
 
 onMounted(() => {
   aquariumBounds.value = getAquariumBounds();
@@ -30,44 +33,24 @@ onMounted(() => {
       passive: true,
     }
   );
-
-  watch(
-    () => props.fish,
-    (fish) => {
-      aquariumState.fish = fish.map((f) => ({
-        ...f,
-        aquarium: aquariumBounds.value!,
-        velocityX: 0,
-        velocityY: 0,
-        foodMeter: 100,
-        starveRate: getRandomInt(0.1, 1),
-        xPos: 0,
-        yPos: 0,
-        updateInterval: null,
-      }));
-    },
-    {
-      deep: true,
-    }
-  );
 });
 </script>
 
 <template>
   <section
     ref="aquarium"
-    class="relative bg-aquarium bg-center bg-cover bg-no-repeat w-[75vw] h-screen"
+    class="relative bg-aquarium bg-center bg-cover bg-no-repeat w-[75vw] lg:w-[85vw] h-screen"
   >
     <slot></slot>
 
     <template v-if="aquariumBounds">
       <FishComponent
-        v-for="(fish, index) in aquariumState.fish"
+        v-for="(f, index) in fish"
         :key="`fish-${index}`"
-        :fish="fish"
+        :fish="f"
         :aquarium="aquariumBounds"
         :paused="isPaused"
-        @update-fish="($event) => (aquariumState.fish[index] = $event)"
+        @update-fish="onUpdateFish"
       />
     </template>
   </section>

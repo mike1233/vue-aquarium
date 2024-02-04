@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, reactive, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive } from "vue";
 import deadFish from "./assets/dead.png";
 import type { FishExtended } from "./models/fish.model";
 import { getRandomInt } from "./utils";
@@ -34,11 +34,11 @@ const decideStartingPosition = () => {
 
   fishState.xPos = getRandomInt(
     FISH_WIDTH * 2,
-    fishState.aquarium.width - FISH_WIDTH * 2
+    props.aquarium.width - FISH_WIDTH * 2
   );
   fishState.yPos = getRandomInt(
     FISH_HEIGHT * 2,
-    fishState.aquarium.height - FISH_HEIGHT * 2
+    props.aquarium.height - FISH_HEIGHT * 2
   );
 };
 
@@ -80,7 +80,7 @@ const moveFish = () => {
 };
 
 const eatFood = () => {
-  if (isDead.value) {
+  if (isDead.value || props.paused) {
     return;
   }
   fishState.foodMeter = 100;
@@ -94,11 +94,11 @@ const starve = () => {
 };
 
 const xBoundary = computed(() => {
-  return fishState.aquarium.width - FISH_WIDTH - 24;
+  return props.aquarium.width - FISH_WIDTH - 24;
 });
 
 const yBoundary = computed(() => {
-  return fishState.aquarium.height - FISH_HEIGHT - 24;
+  return props.aquarium.height - FISH_HEIGHT - 24;
 });
 
 const isDead = computed(() => {
@@ -133,6 +133,8 @@ const fishHealthStyle = computed(() => ({
 }));
 
 const setFishInterval = () => {
+  emit("updateFish", fishState);
+
   fishState.updateInterval = setInterval(() => {
     if (props.paused) {
       return;
@@ -145,13 +147,6 @@ const setFishInterval = () => {
     moveFish();
   }, 100);
 };
-
-watch(
-  () => props.aquarium,
-  () => {
-    fishState.aquarium = props.aquarium;
-  }
-);
 
 onMounted(() => {
   decideStartingPosition();

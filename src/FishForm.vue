@@ -8,6 +8,10 @@ import tuna from "./assets/tuna.png";
 
 import { type Fish } from "./models/fish.model";
 
+const props = defineProps<{
+  fish: Fish[];
+}>();
+
 const emit = defineEmits<{
   (event: "addFish", fish: Fish): void;
 }>();
@@ -41,24 +45,38 @@ const form = reactive<Fish>({
 });
 
 const selectFish = (fish: Fish) => {
-  form.name = fish.name;
   form.img = fish.img;
+
+  const existingSimilarFish = props.fish.filter((f) => f.img === fish.img);
+  if (existingSimilarFish.length) {
+    form.name = `${fish.name} #${existingSimilarFish.length + 1}`;
+    return;
+  }
+
+  form.name = fish.name;
 };
 
 const submitNewFish = (event: Event) => {
   event.preventDefault();
-  emit("addFish", form);
+  const newFish = { ...form };
+  emit("addFish", newFish);
+  form.name = "";
+  form.img = "";
 };
 </script>
 <template>
-  <section class="bg-blue-200 w-[25vw] h-screen">
-    <form @submit="submitNewFish" class="flex flex-col h-full gap-2 p-4">
+  <section class="bg-blue-200 w-[25vw] lg:w-[15vw] h-screen">
+    <form
+      @submit="submitNewFish"
+      class="flex flex-col h-full gap-2 p-2 lg:p-4 text-center"
+    >
       <h2 class="text-2xl font-bold">Add a Fish</h2>
       <label for="species">Species</label>
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-wrap items-center justify-center gap-2">
         <img
           @click="selectFish(f)"
-          class="w-16 h-16 object-contain"
+          class="w-16 h-16 object-contain rounded-md hover:cursor-pointer border-2 hover:border-blue-400 transition-all"
+          :class="form.img === f.img ? 'border-blue-600' : 'border-transparent'"
           v-for="f in fish"
           :key="f.name"
           :src="f.img"
