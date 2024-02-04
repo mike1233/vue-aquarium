@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, watch } from "vue";
-import deadFish from './assets/dead.png';
+import deadFish from "./assets/dead.png";
 import type { FishExtended } from "./models/fish.model";
 import { getRandomInt } from "./utils";
 
@@ -11,7 +11,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'updateFish', fish: FishExtended): void;
+  (event: "updateFish", fish: FishExtended): void;
 }>();
 
 const FISH_WIDTH = 64;
@@ -28,12 +28,18 @@ const decideVelocity = () => {
 };
 
 const decideStartingPosition = () => {
-  if(fishState.xPos && fishState.yPos) {
+  if (fishState.xPos && fishState.yPos) {
     return;
   }
 
-  fishState.xPos = getRandomInt(FISH_WIDTH * 2, fishState.aquarium.width - FISH_WIDTH * 2);
-  fishState.yPos = getRandomInt(FISH_HEIGHT * 2, fishState.aquarium.height - FISH_HEIGHT * 2);
+  fishState.xPos = getRandomInt(
+    FISH_WIDTH * 2,
+    fishState.aquarium.width - FISH_WIDTH * 2
+  );
+  fishState.yPos = getRandomInt(
+    FISH_HEIGHT * 2,
+    fishState.aquarium.height - FISH_HEIGHT * 2
+  );
 };
 
 const moveFish = () => {
@@ -52,17 +58,23 @@ const moveFish = () => {
   const isMovingToXStart = fishState.xPos > previousX;
   const isOutsideXEnd = fishState.xPos > xBoundary.value;
   const isMovingToXEnd = fishState.xPos < previousX;
-  
-  if ((isOutsideXStart && !isMovingToXStart) || (isOutsideXEnd && !isMovingToXEnd)) {
+
+  if (
+    (isOutsideXStart && !isMovingToXStart) ||
+    (isOutsideXEnd && !isMovingToXEnd)
+  ) {
     fishState.velocityX *= -1;
-  }  
-  
+  }
+
   const isOutsideYStart = fishState.yPos < 0;
   const isMovingToYStart = fishState.yPos > previousY;
   const isOutsideYEnd = fishState.yPos > yBoundary.value;
   const isMovingToYEnd = fishState.yPos < previousY;
-  
-  if ((isOutsideYStart && !isMovingToYStart) || (isOutsideYEnd && !isMovingToYEnd)){
+
+  if (
+    (isOutsideYStart && !isMovingToYStart) ||
+    (isOutsideYEnd && !isMovingToYEnd)
+  ) {
     fishState.velocityY *= -1;
   }
 };
@@ -122,14 +134,14 @@ const fishHealthStyle = computed(() => ({
 
 const setFishInterval = () => {
   fishState.updateInterval = setInterval(() => {
-    if(props.paused) {
+    if (props.paused) {
       return;
     }
     starve();
     if (isDead.value && fishState.yPos >= yBoundary.value) {
       clearInterval(fishState.updateInterval as NodeJS.Timer);
     }
-    emit('updateFish', fishState);
+    emit("updateFish", fishState);
     moveFish();
   }, 100);
 };
@@ -139,7 +151,7 @@ watch(
   () => {
     fishState.aquarium = props.aquarium;
   }
-)
+);
 
 onMounted(() => {
   decideStartingPosition();
@@ -153,8 +165,14 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div @click="eatFood" class="fish absolute transition-all will-change-transform ease-in" :style="fishPositionStyle">
-    <div class="text-black flex justify-center w-full pointer-events-none">{{ fish.name }}</div>
+  <div
+    @click="eatFood"
+    class="fish absolute transition-all will-change-transform ease-in"
+    :style="fishPositionStyle"
+  >
+    <div class="text-black flex justify-center w-full pointer-events-none">
+      {{ fish.name }}
+    </div>
     <div class="bg-red-500 h-2 w-16">
       <div :style="fishHealthStyle" class="bg-green-500 h-2"></div>
     </div>
