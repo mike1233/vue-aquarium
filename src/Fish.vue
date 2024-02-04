@@ -15,7 +15,7 @@ const emit = defineEmits<{
 }>();
 
 const FISH_WIDTH = 64;
-const FISH_HEIGHT = 64 + 8;
+const FISH_HEIGHT = 64;
 
 const fishState = reactive<FishExtended>(props.fish);
 
