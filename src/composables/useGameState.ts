@@ -22,11 +22,13 @@ export function useGameState() {
 
   const saveGame = () => {
     localStorage.setItem("fish", JSON.stringify(state.fish));
+    state.isPaused = true;
   };
 
   const clearGame = () => {
     localStorage.removeItem("fish");
     state.fish = [];
+    state.isPaused = true;
   };
 
   const addFish = (newFish: Fish) => {
