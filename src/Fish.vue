@@ -86,9 +86,19 @@ const eatFood = () => {
   if (fish.fedCounter % 10 === 0) {
     fish.size = upgradeFishSize(fish.size, 32);
     fish.starveRate += 0.25;
+    fish.velocityX *= 1.25;
+    fish.velocityY *= 1.25;
   }
 
-  emit("updateScore", fish.size + fish.fedCounter);
+  emit(
+    "updateScore",
+    Math.floor(
+      fish.size +
+        fish.fedCounter +
+        Math.abs(fish.velocityX) +
+        Math.abs(fish.velocityY)
+    )
+  );
 };
 
 const starve = () => {
@@ -161,7 +171,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div
-    class="fish absolute flex flex-col items-center transition-all will-change-transform ease-in"
+    class="fish absolute flex flex-col items-center transition-all ease-linear will-change-transform"
     :style="fishPositionStyle"
   >
     <div
@@ -177,10 +187,11 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <img
-      class="object-contain transition-all"
+      class="object-contain transition-all ease-linear"
       :style="fishStyle"
       :src="fishImage"
       :alt="fish.name"
+      draggable="false"
       @click="eatFood"
     />
   </div>
