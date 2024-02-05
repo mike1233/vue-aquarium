@@ -10,16 +10,13 @@ defineProps<{
 
 const emit = defineEmits<{
   (event: "updateFish", fish: FishExtended): void;
+  (event: "updateScore", score: number): void;
 }>();
 
 const aquarium = ref<HTMLDivElement>();
 const aquariumBounds = ref<DOMRect | null>(null);
 
 const getAquariumBounds = () => aquarium.value?.getBoundingClientRect() ?? null;
-
-const onUpdateFish = (updatedFish: FishExtended) => {
-  emit("updateFish", updatedFish);
-};
 
 onMounted(() => {
   aquariumBounds.value = getAquariumBounds();
@@ -50,7 +47,8 @@ onMounted(() => {
         :fish="f"
         :aquarium="aquariumBounds"
         :paused="isPaused"
-        @update-fish="onUpdateFish"
+        @update-fish="$emit('updateFish', $event)"
+        @update-score="$emit('updateScore', $event)"
       />
     </template>
   </section>

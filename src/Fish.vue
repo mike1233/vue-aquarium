@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive } from "vue";
 import deadFish from "./assets/dead.png";
 import type { FishExtended } from "./models/fish.model";
-import { getRandomInt } from "./utils";
+import { getRandomInt, upgradeFishSize } from "./utils";
 
 const props = defineProps<{
   fish: FishExtended;
@@ -12,70 +12,67 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: "updateFish", fish: FishExtended): void;
+  (event: "updateScore", score: number): void;
 }>();
 
-const FISH_WIDTH = 64;
-const FISH_HEIGHT = 64;
-
-const fishState = reactive<FishExtended>(props.fish);
+const fish = reactive<FishExtended>(props.fish);
 
 const decideVelocity = () => {
-  if (fishState.velocityX && fishState.velocityY) {
-    return;
-  }
-  fishState.velocityX = Math.random() * 5;
-  fishState.velocityY = Math.random() * 5;
+  if (fish.velocityX && fish.velocityY) return;
+
+  fish.velocityX = Math.random() > 0.5 ? Math.random() * 5 : -Math.random() * 5;
+
+  fish.velocityY = Math.random() > 0.5 ? Math.random() * 5 : -Math.random() * 5;
 };
 
 const decideStartingPosition = () => {
-  if (fishState.xPos && fishState.yPos) {
-    return;
-  }
+  if (fish.xPos && fish.yPos) return;
 
-  fishState.xPos = getRandomInt(
-    FISH_WIDTH * 2,
-    props.aquarium.width - FISH_WIDTH * 2
+  fish.xPos = getRandomInt(
+    props.fish.size * 2,
+    props.aquarium.width - props.fish.size * 2
   );
-  fishState.yPos = getRandomInt(
-    FISH_HEIGHT * 2,
-    props.aquarium.height - FISH_HEIGHT * 2
+
+  fish.yPos = getRandomInt(
+    props.fish.size * 2,
+    props.aquarium.height - props.fish.size * 2
   );
 };
 
 const moveFish = () => {
   if (isDead.value) {
-    fishState.yPos += 10;
+    fish.yPos += 10;
     return;
   }
 
-  const previousX = fishState.xPos;
-  const previousY = fishState.yPos;
+  const previousX = fish.xPos;
+  const previousY = fish.yPos;
 
-  fishState.xPos += fishState.velocityX;
-  fishState.yPos += fishState.velocityY;
+  fish.xPos += fish.velocityX;
+  fish.yPos += fish.velocityY;
 
-  const isOutsideXStart = fishState.xPos < 0;
-  const isMovingToXStart = fishState.xPos > previousX;
-  const isOutsideXEnd = fishState.xPos > xBoundary.value;
-  const isMovingToXEnd = fishState.xPos < previousX;
+  const isOutsideXStart = fish.xPos < 0;
+  const isMovingToXStart = fish.xPos > previousX;
+  const isOutsideXEnd = fish.xPos > xBoundary.value;
+  const isMovingToXEnd = fish.xPos < previousX;
 
   if (
     (isOutsideXStart && !isMovingToXStart) ||
     (isOutsideXEnd && !isMovingToXEnd)
   ) {
-    fishState.velocityX *= -1;
+    fish.velocityX *= -1;
   }
 
-  const isOutsideYStart = fishState.yPos < 0;
-  const isMovingToYStart = fishState.yPos > previousY;
-  const isOutsideYEnd = fishState.yPos > yBoundary.value;
-  const isMovingToYEnd = fishState.yPos < previousY;
+  const isOutsideYStart = fish.yPos < 0;
+  const isMovingToYStart = fish.yPos > previousY;
+  const isOutsideYEnd = fish.yPos > yBoundary.value;
+  const isMovingToYEnd = fish.yPos < previousY;
 
   if (
     (isOutsideYStart && !isMovingToYStart) ||
     (isOutsideYEnd && !isMovingToYEnd)
   ) {
-    fishState.velocityY *= -1;
+    fish.velocityY *= -1;
   }
 };
 
@@ -83,66 +80,69 @@ const eatFood = () => {
   if (isDead.value || props.paused) {
     return;
   }
-  fishState.foodMeter = 100;
+  fish.foodMeter = 100;
+  fish.fedCounter++;
+
+  if (fish.fedCounter % 10 === 0) {
+    fish.size = upgradeFishSize(fish.size, 32);
+    fish.starveRate += 0.25;
+  }
+
+  emit("updateScore", fish.size + fish.fedCounter);
 };
 
 const starve = () => {
   if (isDead.value) {
     return;
   }
-  fishState.foodMeter -= fishState.starveRate;
+  fish.foodMeter -= fish.starveRate;
 };
 
 const xBoundary = computed(() => {
-  return props.aquarium.width - FISH_WIDTH - 24;
+  return props.aquarium.width - props.fish.size - 24;
 });
 
 const yBoundary = computed(() => {
-  return props.aquarium.height - FISH_HEIGHT - 24;
+  return props.aquarium.height - props.fish.size - 24;
 });
 
 const isDead = computed(() => {
-  return fishState.foodMeter <= 0;
+  return fish.foodMeter <= 0;
 });
 
 const fishImage = computed(() => {
   if (isDead.value) {
     return deadFish;
   }
-  return fishState.img;
+  return fish.img;
 });
 
-const fishPositionStyle = computed(() => ({
-  left: `${fishState.xPos}px`,
-  top: `${fishState.yPos}px`,
+const fishStyle = computed(() => ({
+  transform: fish.velocityX > 0 ? "scaleX(1)" : "scaleX(-1)",
+  width: `${fish.size}px`,
+  height: `${fish.size}px`,
 }));
 
-const fishStyle = computed(() => {
-  if (fishState.velocityX > 0) {
-    return {
-      transform: "scaleX(1)",
-    };
-  }
-  return {
-    transform: "scaleX(-1)",
-  };
-});
+const fishPositionStyle = computed(() => ({
+  left: `${fish.xPos}px`,
+  top: `${fish.yPos}px`,
+}));
 
 const fishHealthStyle = computed(() => ({
-  width: `${fishState.foodMeter}%`,
+  width: `${fish.foodMeter}%`,
 }));
 
 const setFishInterval = () => {
-  fishState.updateInterval = setInterval(() => {
+  fish.updateInterval = setInterval(() => {
     if (props.paused) {
       return;
     }
     starve();
-    if (isDead.value && fishState.yPos >= yBoundary.value) {
-      clearInterval(fishState.updateInterval as NodeJS.Timer);
+    if (isDead.value && fish.yPos >= yBoundary.value) {
+      clearInterval(fish.updateInterval as NodeJS.Timer);
     }
     moveFish();
-    emit("updateFish", fishState);
+    emit("updateFish", fish);
   }, 100);
 };
 
@@ -151,11 +151,11 @@ onMounted(() => {
   decideVelocity();
   setFishInterval();
 
-  emit("updateFish", fishState);
+  emit("updateFish", fish);
 });
 
 onBeforeUnmount(() => {
-  clearInterval(fishState.updateInterval as NodeJS.Timer);
+  clearInterval(fish.updateInterval as NodeJS.Timer);
 });
 </script>
 
@@ -177,7 +177,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <img
-      class="w-16 h-16 object-contain"
+      class="object-contain transition-all"
       :style="fishStyle"
       :src="fishImage"
       :alt="fish.name"

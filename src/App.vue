@@ -12,6 +12,7 @@ const {
   clearGame,
   addFish,
   updateFish,
+  updateScore,
 } = useGameState();
 
 const pauseButtonText = computed(() => (state.isPaused ? "Resume" : "Pause"));
@@ -27,6 +28,7 @@ onMounted(() => {
       :is-paused="state.isPaused"
       :fish="state.fish"
       @update-fish="updateFish"
+      @update-score="updateScore"
     >
       <div class="game-buttons mt-2 mr-2 flex justify-end gap-2">
         <button
@@ -52,6 +54,14 @@ onMounted(() => {
         >
           Clear
         </button>
+      </div>
+      <div
+        class="game-score relative flex justify-center mt-2 w-full pointer-events-none"
+      >
+        <span
+          class="text-white font-bold bg-opacity-30 bg-blue-950 p-2 rounded-md"
+          >Score: {{ state.score }}
+        </span>
       </div>
     </Aquarium>
   </main>
